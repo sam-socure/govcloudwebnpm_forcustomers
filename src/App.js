@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import SigmaDeviceManager from '@socure-inc/device-risk-sdk';
+import Page1 from './components/Page1'; // Adjust the path if necessary
 
-function App() {
+const sigmaDeviceOptions = {
+  sdkKey: process.env.GOVCLOUD_SDK_KEY,
+  useSocureGov: true
+};
+
+  // Initialize SigmaDeviceManager outside of useEffect
+  SigmaDeviceManager.initialize(sigmaDeviceOptions);
+
+const App = () => {
+  const [sessionToken, setSessionToken] = useState('');
+
+
+
+  const fetchSessionToken = () => {
+    SigmaDeviceManager.getSessionToken()
+      .then((sessionToken) => {
+        console.log("sessionToken", sessionToken);
+        setSessionToken(sessionToken);
+      })
+      .catch(err => {
+        console.error('Error fetching session token:', err);
+        // Handle error state or feedback to the user
+      });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Page1 fetchSessionToken={fetchSessionToken} sessionToken={sessionToken} />
     </div>
   );
-}
+};
 
 export default App;
